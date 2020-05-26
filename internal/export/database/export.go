@@ -78,6 +78,24 @@ func (db *ExportDB) AddExportConfig(ctx context.Context, ec *model.ExportConfig)
 	})
 }
 
+func (db *ExportDB) GetExportConfig(ctx context.Context, id int64) (*model.ExportConfig, error) {
+	conn, err := db.db.Pool.Acquire(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("acquiring connection: %w", err)
+	}
+	defer conn.Release()
+
+	row := conn.QueryRow(ctx, `
+		SELECT
+			config_id, bucket_name, filename_root, period_seconds, region, from_timestamp, thru_timestamp, signature_info_ids
+		FROM
+			ExportConfig
+		WHERE
+			config_id = $1`, id)
+
+	return scanOneExportConfig(row)
+}
+
 func (db *ExportDB) GetAllExportConfigs(ctx context.Context) ([]*model.ExportConfig, error) {
 	conn, err := db.db.Pool.Acquire(ctx)
 	if err != nil {

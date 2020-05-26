@@ -47,6 +47,22 @@ func (e *ExportConfig) FormattedThruTime() string {
 	return e.Thru.Format(time.UnixDate)
 }
 
+func (e *ExportConfig) FromHTMLDate() string {
+	return toHTMLDate(e.From)
+}
+
+func (e *ExportConfig) FromHTMLTime() string {
+	return toHTMLTime(e.From)
+}
+
+func (e *ExportConfig) ThruHTMLDate() string {
+	return toHTMLDate(e.Thru)
+}
+
+func (e *ExportConfig) ThruHTMLTime() string {
+	return toHTMLTime(e.Thru)
+}
+
 type ExportBatch struct {
 	BatchID          int64     `db:"batch_id" json:"batchID"`
 	ConfigID         int64     `db:"config_id" json:"configID"`
@@ -90,16 +106,24 @@ func (s *SignatureInfo) FormattedEndTimestamp() string {
 
 // HTMLEndDate returns EndDate in a format for the HTML date input default value.
 func (s *SignatureInfo) HTMLEndDate() string {
-	if s.EndTimestamp.IsZero() {
-		return ""
-	}
-	return s.EndTimestamp.UTC().Format("2006-01-02")
+	return toHTMLDate(s.EndTimestamp)
 }
 
 // HTMLEndTime returns EndDate in a format for the HTML time input default value.
 func (s *SignatureInfo) HTMLEndTime() string {
-	if s.EndTimestamp.IsZero() {
+	return toHTMLTime(s.EndTimestamp)
+}
+
+func toHTMLDate(t time.Time) string {
+	if t.IsZero() {
 		return ""
 	}
-	return s.EndTimestamp.UTC().Format("15:04")
+	return t.UTC().Format("2006-01-02")
+}
+
+func toHTMLTime(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.UTC().Format("15:042")
 }
